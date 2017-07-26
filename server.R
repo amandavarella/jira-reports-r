@@ -27,9 +27,7 @@ jiraAddress = ""
 vProj <- c("ATLAS", "PNI")
 
 
-
 vTotalProj <- length(vProj)
-
 
 
 vIniDate <- c("2017-03-01", "2017-03-01")
@@ -512,22 +510,22 @@ shinyServer(function(input, output, session) {
 
     # Histogram Statistics
       output$tableHist <- DT::renderDataTable({
-            shiny::validate(
-                  need(input$selProj != "SEL", "")
-            )
-
-            if (is.null(listProjLT[[indProj]])) {
-                  return()
-            }
-
-            tLTNames <- c("Average", "Median", vLQ)
-            avg <<- as.numeric(format(avg, digits=2, nsmall=2))
-            md <<- as.numeric(format(md, digits=2, nsmall=2))
-            vQ <<- as.numeric(format(vQ, digits=2, nsmall=2))
-            tLTValues <- c(avg, md, vQ)
-            mLT <- matrix(tLTValues, nrow=1)
-            colnames(mLT) <- tLTNames
-            mLT
+        shiny::validate(
+          need(input$selProj != "SEL", "")
+        )
+        
+        if (is.null(listProjLT[[indProj]])) {
+          return()
+        }
+        
+        tLTNames <- c("Average", "Median", vLQ)
+        avg <<- as.numeric(format(avg, digits=2, nsmall=2))
+        md <<- as.numeric(format(md, digits=2, nsmall=2))
+        vQ <<- as.numeric(format(vQ, digits=2, nsmall=2))
+        tLTValues <- c(avg, md, vQ)
+        mLT <- matrix(tLTValues, nrow=1)
+        colnames(mLT) <- tLTNames
+        mLT
       }, options=list(paging=FALSE, info=FALSE, searching=FALSE, ordering=FALSE))
 
     # Weibull Parameters
@@ -568,26 +566,44 @@ shinyServer(function(input, output, session) {
             colnames(mLT) <- tLTNames
             mLT
       }, options=list(paging=FALSE, info=FALSE, searching=FALSE, ordering=FALSE))
+      
+      
+      # PI Panel Epics
+      output$piPanelEpics <- renderPlot({
+        shiny::validate(
+          need(aut, ""),
+          need(input$selProj != "SEL", "")
+        )
+        
+        gt = getBurndownPI("Epic")
+        plot(gt)
+        #grid.draw(gt)
+      })
+      
+      # PI Panel Stories
+      output$piPanelStories <- renderPlot({
+        shiny::validate(
+          need(aut, ""),
+          need(input$selProj != "SEL", "")
+        )
+        
+        gt = getBurndownPI("Story")
+        plot(gt)
+        #grid.draw(gt)
+      })
+      
+      
+      
 
     # Observe for authentication
       observeEvent(input$okAut, {
-            j1 <- paste(jiraAddress,"/rest/auth/1/session", sep="")
+            
 
             user <- input$chave
             pass <- input$senha
-            if (user != "" & pass != "") {
-                  r1 <- HEAD(j1,
-                        config(ssl_verifypeer=FALSE),
-                        body=FALSE,
-                        add_headers("Accept"="application/json",
-                                    "Content-Type"="application/json"),
-                        authenticate(user, pass), verbose())
-
-                  if (status_code(r1) == 200) {
-                        aut <<- TRUE
-                        scookie <<- paste("JSESSIONID=", cookies(r1)$JSESSIONID, "; Path=/Jira", sep="")
-                  }
-            }
+            
+            aut <- jiraAuthentication(jiraAddress, user, pass)
+            
             if (!aut) {
                   updateTextInput(session, "chave", value="")
                   updateTextInput(session, "senha", value="")

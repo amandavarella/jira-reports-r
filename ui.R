@@ -3,7 +3,7 @@ library(shiny)
 shinyUI(fluidPage(
   fluidRow(
     column(4,
-           titlePanel("Estatísticas Jira")
+           titlePanel("Jira Statistics")
     ),
     column(1, offset=11,
            actionButton("sair","Sair")
@@ -130,6 +130,20 @@ shinyUI(fluidPage(
                                 DT::dataTableOutput("tableWeibullParam"),
                                 br(),
                                 DT::dataTableOutput("tableWeibullValues")
+                       ),
+                       
+                       tabPanel("PI Epics",
+                                plotOutput("piPanelEpics", width="100%", height="600px")
+                              
+                       ),
+                       
+                       tabPanel("PI Stories",
+                                plotOutput("piPanelStories", width="100%", height="600px")
+                                
                        )
+                       
+                       
+                       
+                       
   ))
 ))

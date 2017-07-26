@@ -17,80 +17,68 @@ library(lubridate)
 library(DT)
 library(plyr)
 
+source("getleadtime.R")
+
 # Initialize
 # Para acrescentar projetos, é necessário atualizar as variáveis abaixo
 ###################################################
+jiraAddress = ""
+
+vProj <- c("ATLAS", "PNI")
 
 
-vProj <- c("SAG", "SGA", "SIRR", "VRT", "SIPLEX", "VRTCR", "GIPCR")
+
 vTotalProj <- length(vProj)
 
 
-vIniDate <- c("2013-01-01", "2013-01-01", "2013-01-01", "2015-01-01", "2014-07-01", "2015-10-01", "2015-10-01")
+
+vIniDate <- c("2017-03-01", "2017-03-01")
 
 
-vTypeClosed <- c("'Story','Suporte','Débito Técnico','Reunião','Defeito'",
-               "'Story','Suporte','Consultoria','Reunião','Defeito'",
-               "'Story','Melhoria','Débito Técnico','Technical Support','Defeito'",
-               "'Story','Melhoria','Débito Técnico','Suporte','Defeito','Epic','Tarefa'",
-               "'Story','Melhoria','Débito Técnico','Suporte','Defeito','Epic','Tarefa'",
-               "'Story','Melhoria','Atividade de Atendimento de Desenvolvimento','Manutenção Corretiva Produção','Manutenção Corretiva Emergencial Produção'",
-               "'Story','Melhoria','Atividade de Atendimento de Desenvolvimento','Epic','Manutenção Corretiva Produção'")
+vTypeClosed <- c(
+               "'Story','Task','Bug'",
+               "'Story','Task','Bug'"
+               )
 
 
-rView <- c(23, 1022, 711, 981, 682, 5299, 5473)
+rView <- c(116, 373)
 
 
 
 ccColumns <- list(
-                     c(67, 66, 59, 2667, 69, 65, 68, 3757),
-                     c(2269, 2658, 2271, 2272, 7252, 7255),
-                     c(1366, 1373, 1374, 1378, 2917, 6482, 6792),
-                     c(13903,	2136,	2137,	2394,	2395),
-                     c(1566, 2179, 7180, 7181, 1223),
-                     c(13587,13588,13589,13590,13591,13592,13593,13594,13595,13596,13597,13598,13599),
-                     c(14268,14269,14270,14271,14272,14273,14274,14275,14276,14277,14278,14279,14267)
+                     c(3794,603,3788,3784),
+                     c(1951,8710,8714)
                    )
-
 
 
 
 ccSwimLaneId <- list(
-                       c(1407, 1209),
-                       c(1435, 1436, 1437, 1438, 1439, 1433),
-                       c(888, 986, 1253, 7191, 1712, 894, 889),
-                       c(1363, 1486, 1487, 1488, 1489, 1490, 1524, 1362),
-                       c(2585, 3718, 4993, 6292, 6461, 6904, 8195, 826,	827, 828, 829, 831, 832, 833, 835, 9045, 825),
-                       c(9981,8818,8819,8820),
-                       c(12399,	12429, 12430,	12431,	9026,	9740, 9025)
+                       c(169),
+                       c(527)
                      )
 
 
-ccQuickFilterId <- c(1173, 1669, 923, 9455, 9624, 10301, 11880)
+ccQuickFilterId <- c(1875, 3126)
 
 
 cfColumns <- list(
-                    c(58, 67, 66, 59, 2667, 69, 65, 68, 60),
-                    c(2268, 2269, 2658, 2271, 2272, 2273, 7252, 7255),
-                    c(1365, 1373, 1366, 2917, 1378, 6482, 1374, 6792, 1367),
-                    c(2393,	2136,	2395,	2394,	13903,	2137),
-                    c(6794, 1223, 1566, 7181, 2179, 7180, 1224),
-                    c(13586,13587,13588,13589,13590,13591,13592,13593,13594,13595,13596,13597,13598,13599,13600),
-                    c(14266, 14267,	14268,	14269,	14270,	14271,	14272,	14273,	14274,	14275,	14276,	14277,	14278,	14279,	14280)
+                    c(602,3794,603,3788,3784,604),
+                    c(1950, 1951, 1952, 8710, 8714)
                   )
 
 
 cfSwimLane <- list(
-                     c(1306, 1407, 1209, 1208, 27, 28),
-                     c(1435, 1436, 1437, 1438, 1439, 1433),
-                     c(1253, 1712, 7191, 888, 894, 986, 889),
-                     c(1362,	1487,	1524,	1489,	1490,	1486,	1488,	1363),
-                     c(825, 4993, 6292, 8195, 3718, 831, 835, 833, 2585, 6904, 832, 829, 828, 827, 6461, 9045, 826),
-                     c(9981,8818,8819,8820),
-                     c(9025,	12399,	12429,	12430,	12431,	9740,	9026)
+                     c(169),
+                     c(527)
                    )
 
+testVectorSizes <- c(length(vProj), length(vIniDate), length(vTypeClosed), length(rView), length(ccColumns), length(ccSwimLaneId), length(ccQuickFilterId), length(cfColumns), length(cfSwimLane))
 
+if(length(unique(testVectorSizes)) > 1){
+  print("Tamanhos de vetores diferentes")
+  print(testVectorSizes)
+  stopApp(returnValue=NULL)
+}
 ############################################################################################
 ##No arquivo ui.R, alterar tabPanel("Projeto", para incluir o projeto desejado na interface
 ###########################################################################################
@@ -123,6 +111,9 @@ shinyServer(function(input, output, session) {
             )
 
             proj <- input$selProj
+            #if (proj =="ATLAS" | proj = "PNI")
+            #    proj <- "ACT"
+            
 
             closedProj <- listProjClosed[[indProj]]
             if (is.null(closedProj)) {
@@ -213,8 +204,8 @@ shinyServer(function(input, output, session) {
                         theme(axis.text.x=element_text(vjust=0.5, angle=45)) +
                         theme(plot.margin=unit(c(1, 3, 1, 1), "lines")) +
                         labs(x="Data de Resolução", y="Quantidade") +
-                        scale_x_date(breaks=dfTP$Data, labels=date_format("%b-%Y")) +
-                        scale_y_discrete(breaks=vLTSP, labels=vLTSP)
+                        scale_x_date(breaks=dfTP$Data, labels=date_format("%b-%Y")) ##+
+                        ##scale_y_discrete(breaks=vLTSP, labels=vLTSP)
 
                   g <- g + geom_line(aes(colour=Tipo.de.Pendência), size=1.2)
 
@@ -231,8 +222,9 @@ shinyServer(function(input, output, session) {
                         theme(axis.text.x=element_text(vjust=0.5, angle=45)) +
                         theme(plot.margin=unit(c(1, 3, 1, 1), "lines")) +
                         labs(x="Data de Resolução", y="Quantidade - Story") +
-                        scale_x_date(breaks=storyThroughput$Data, labels=date_format("%b-%Y")) +
-                        scale_y_discrete(breaks=vy, labels=vy)
+                        scale_x_date(breaks=storyThroughput$Data, labels=date_format("%b-%Y")) ##+
+                        ##scale_y_discrete(breaks=vy, labels=vy)
+                  ##Comentando escala
 
                   g <- g + geom_line(colour="midnightblue", size=1.2)
             }
@@ -260,6 +252,7 @@ shinyServer(function(input, output, session) {
             }
 
             proj <- input$selProj
+            #proj <- "ACT"
 
             mLT <- aggregate(meanLT$Lead.Time, list(meanLT$Data), mean)
             colnames(mLT) <- c("Data", "LT.Médio")
@@ -290,8 +283,8 @@ shinyServer(function(input, output, session) {
                   theme(axis.text.x=element_text(vjust=0.5, angle=45)) +
                   theme(plot.margin=unit(c(1, 3, 1, 1), "lines")) +
                   labs(x="Data de Resolução", y="Lead Time Médio - Story") +
-                  scale_x_date(breaks=mLT$Data, labels=date_format("%b-%Y")) +
-                  scale_y_discrete(breaks=vy, labels=vy)
+                  scale_x_date(breaks=mLT$Data, labels=date_format("%b-%Y")) ##+
+                  ##scale_y_discrete(breaks=vy, labels=vy)
 
             g <- g + geom_line(colour="midnightblue", size=1.2) +
                   geom_line(aes(Data, LT.PQuantil), colour="steelblue", size=1) +
@@ -313,6 +306,7 @@ shinyServer(function(input, output, session) {
             )
 
             proj <- input$selProj
+            #proj <- "ACT"
 
             ltProj <- listProjLT[[indProj]]
             if (is.null(ltProj)) {
@@ -353,8 +347,7 @@ shinyServer(function(input, output, session) {
             vx <- c(0, (1:xh)*20)
 
             g <- g + scale_x_date(breaks=date_breaks("1 month"), labels=date_format("%b-%Y")) +
-                  scale_y_discrete(breaks=vx, labels=vx) +
-#                     geom_text(aes(label=counts$Freq, x=vx, y=counts$y, vjust=-1, size=3)) +
+                  ##scale_y_discrete(breaks=vx, labels=vx) +
                   annotate("text", x=as.Date(Inf, origin="1970-01-01"), y=vQ,
                            hjust=0, label=vLQ, size=3.5)
 
@@ -370,7 +363,8 @@ shinyServer(function(input, output, session) {
                   need(input$selProj != "SEL", "")
             )
 
-            proj <- input$selProj
+            #proj <- input$selProj
+            proj <- "ACT"
 
             ltProj <- listProjLT[[indProj]]
             if (is.null(ltProj)) {
@@ -399,8 +393,9 @@ shinyServer(function(input, output, session) {
             yh <- yh / 2
             vy <- c(0, (1:yh)*2)
 
-            g <- g + scale_x_discrete(breaks=vx, labels=vx) +
-                  scale_y_discrete(breaks=vy, expand=waiver()) +
+            g <- g + 
+                  ##scale_x_discrete(breaks=vx, labels=vx) +
+                  ##scale_y_discrete(breaks=vy, expand=waiver()) +
                   geom_vline(xintercept=vQ[1], color="royalblue4", size=1, linetype=2) +
                   geom_vline(xintercept=vQ[2], color="royalblue1", size=1, linetype=2) +
                   geom_vline(xintercept=vQ[3], color="yellow", size=1, linetype=2) +
@@ -415,13 +410,16 @@ shinyServer(function(input, output, session) {
       })
 
     # Weibull curves
+    #https://connected-knowledge.com/2014/09/08/how-to-match-to-weibull-distribution-without-excel/
+      
       output$plotWeibull <- renderPlot({
             shiny::validate(
                   need(aut, ""),
                   need(input$selProj != "SEL", "")
             )
 
-            proj <- input$selProj
+            #proj <- input$selProj
+            proj <- "ACT"
 
             ltProj <- listProjLT[[indProj]]
             if (is.null(ltProj)) {
@@ -573,7 +571,7 @@ shinyServer(function(input, output, session) {
 
     # Observe for authentication
       observeEvent(input$okAut, {
-            j1 <- "https://jira.com.br:8443/rest/auth/1/session"
+            j1 <- paste(jiraAddress,"/rest/auth/1/session", sep="")
 
             user <- input$chave
             pass <- input$senha
@@ -601,13 +599,25 @@ shinyServer(function(input, output, session) {
 
     # Observe for project selection
       observeEvent(input$selProj, {
+            
             if (input$selProj != "SEL") {
                   proj <- input$selProj
-                  indProj <<- grep(paste("^",proj,"$",sep = ""), vProj)
 
+                  
+                  indProj <<- grep(paste("^",proj,"$",sep = ""), vProj)
+                  
+                  #Refatorar
+                  proj <- "ACT"
+                  print(input$selProj)
+                  
+                  if(input$selProj=="ATLAS"){
+                    team = 90
+                  }else if(input$selProj=="PNI"){
+                    team = 87
+                  }
 
                   if (is.null(listProjLT[[indProj]])) {
-                        ltProj <- getProjectLT(proj)
+                        ltProj <- getProjectLT(proj, team, jiraAddress, rView, ccSwimLaneId, ccQuickFilterId, ccColumns, vTypeClosed, vIniDate)
                         if (is.null(ltProj)) {
                               return()
                         }
@@ -642,156 +652,6 @@ shinyServer(function(input, output, session) {
 
 })
 
-# Get project Lead Time data
-getProjectLT <- function(proj) {
-      withProgress(message='Lendo dados do projeto', value=0.1, {
-
-          # Read Cycle Time data
-            h1 <- "https://jira.com.br:8443/rest/greenhopper/1.0/rapid/charts/controlchart?"
-
-            param <- paste("rapidViewId=", rView[indProj], sep="")
-            v <- as.vector(ccSwimLaneId[[indProj]])
-            len <- length(v)
-            for (i in 1:len) {
-                  param <- paste(param, "&swimlaneId=", v[i], sep="")
-            }
-            if (!is.na(ccQuickFilterId[indProj])) {
-                  param <- paste(param, "&quickfilterId=", ccQuickFilterId[indProj], sep="")
-            }
-
-            j1 <- paste(h1, param, "&maxResults=2000", sep="")
-
-            incProgress(0.1)
-
-            r1 <- GET(j1,
-                  config(ssl_verifypeer=FALSE),
-                  body=FALSE,
-                  add_headers("Accept"="application/json",
-                        "Content-Type"="application/json",
-#                        "Set-Cookie"= scookie))
-                        "Set-Cookie"= scookie), verbose())
-            if (status_code(r1) != 200 ) {
-                  return(NULL)
-            }
-
-            incProgress(0.15)
-
-            con <- content(r1, "text")
-            dat <- fromJSON(con)
-            lIssues <- dat$issues
-            nIssues <- length(lIssues$key)
-            if (nIssues == 0) {
-                  return(NULL)
-            }
-
-            lColumns <- dat$columns
-            vColumns <- unlist(ccColumns[indProj])
-            vShow <- lColumns$id %in% vColumns
-            vNames <- lColumns$name[vShow]
-            namesCT <- c("Issue", vNames)
-            nc = length(namesCT)
-            dfCT = data.frame(matrix(NA, nrow=nIssues, ncol=nc))
-            names(dfCT) <- namesCT
-
-            dfCT$Issue <- unlist(lIssues$key)
-            for (i in 1:nIssues) {
-                  dfCT[i, 2:nc] <- round(as.double(unlist(lIssues$totalTime[[i]])[vShow] / 1000 / 3600 / 24), 2)
-            }
-
-#            print(dfCT$Issue[order(dfCT$Issue)])
-            fCT <- paste("./data/CT_", proj, ".csv", sep="")
-            write.csv(dfCT[order(dfCT$Issue), ], file=fCT)
-
-            incProgress(0.15, detail="Consulta ao Jira pode demorar...")
-
-          # Read closed data
-            h2 <- "https://jira.com.br:8443/rest/api/2/search?jql="
-            param <- paste("project=", proj,
-                  " and issuetype in (", vTypeClosed[indProj], ") and status in ('Fechada', 'Em Produção')",
-                  " and resolutiondate>=", vIniDate[indProj], sep="")
-            j2 <- paste(h2, param, "&maxResults=2000", sep="")
-
-            r2 <- GET(j2,
-                  config(ssl_verifypeer=FALSE),
-                  body=FALSE,
-                  add_headers("Accept"="application/json",
-                        "Content-Type"="application/json",
-                        "Set-Cookie"= scookie), verbose())
-            if (status_code(r2) != 200) {
-                  return(NULL)
-            }
-            incProgress(0.5, detail="")
-
-            con <- content(r2, "text")
-            dat <- fromJSON(con)
-            lIssues <- dat$issues
-            nIssues <- length(lIssues$key)
-            if (nIssues == 0) {
-                  return(NULL)
-            }
-
-            lFields <- dat$issues$fields
-            namesClosed <- c("Tipo.de.Pendência", "Issue", "Situação", "Data.de.Resolução" )
-            nc = length(namesClosed)
-            dfClosed = data.frame(matrix(NA, nrow=nIssues, ncol=nc))
-            names(dfClosed) <- namesClosed
-            dfClosed$Tipo.de.Pendência <- unlist(lFields$issuetype$name)
-            dfClosed$Issue <- unlist(lIssues$key)
-            dfClosed$Situação <- unlist(lFields$status$name)
-            data <- unlist(lFields$resolutiondate)
-            d <- substr(data, 9, 10)
-            m <- substr(data, 6, 7)
-            y <- substr(data, 1, 4)
-            date <- paste(d, "/", m, "/", y, sep="")
-            dfClosed$Data.de.Resolução <- date
-            listProjClosed[[indProj]] <<- dfClosed
-#            cat("  nrow de dfClosed= ", nrow(dfClosed), "\n")
-#            print(dfClosed)
-
-            incProgress(0.25)
-
-          # Prepare Lead Time data
-            nct <- ncol(dfCT)
-            issueType <- c("Story", "Melhoria")
-            iniType <- as.character(dfClosed$Tipo.de.Pendência)
-            closed <- subset( dfClosed, iniType %in% issueType)
-#            cat("  nrow de closed= ", nrow(closed), "\n")
-            fclosed <- paste("./data/closed_", proj, ".csv", sep="")
-            write.csv(closed[order(closed$Issue), ], file=fclosed)
-
-#            print(closed)
-            LT <- merge(dfCT, closed, by="Issue")
-            nRow <- nrow(LT)
-#            cat("  nrow de LT resultado do merge= ", nRow, "\n")
-            if (nRow == 0) {
-                  return(NULL)
-            }
-
-            for (i in 2:nct) LT[, i] <- as.numeric(LT[, i])
-            LT$Lead.Time <- rowSums(LT[, 2:nct])
-            LT <- subset(LT, LT$Lead.Time>0 & LT$Lead.Time<=1500)
-            if (nrow(LT) == 0) {
-                  return(NULL)
-            }
-
-          # Sort Lead Time data by date and update Lead Time file
-            vDate <- as.Date(LT$Data.de.Resolução, "%d/%m/%Y", tz="")
-            ordem <- order(vDate, LT$Issue)
-            LT <- LT[ordem, ]
-            fLT <- paste("./data/DadosLT_", proj, ".csv", sep="")
-            write.csv(LT, file=fLT)
-
-          # Update date format
-            LT$Data.de.Resolução <- vDate[ordem]
-
-          # Update Lead Time list
-#            cat("  nrow de LT final= ", nrow(LT), "\n")
-            listProjLT[[indProj]] <<- LT
-
-            setProgress(1)
-            return(LT)
-      })
-}
 
 prepareMeanLTData <- function(ltProj) {
 

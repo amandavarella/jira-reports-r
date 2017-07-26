@@ -6,7 +6,7 @@ shinyUI(fluidPage(
            titlePanel("Estatísticas Jira")
     ),
     column(1, offset=11,
-           actionButton("sair", "Sair")
+           actionButton("sair","Sair")
     )
   ),
 
@@ -43,13 +43,9 @@ shinyUI(fluidPage(
                                            selectInput("selProj", label = h5("Projeto:"),
                                                        choices = c(
                                                                      "Selecione" = "SEL",
-                                                                     "SAG" = "SAG",
-                                                                     "SGA" = "SGA",
-                                                                     "SIRR" = "SIRR",
-                                                                     "VRT" = "VRT",
-                                                                     "SIPLEX" = "SIPLEX",
-                                                                     "VRTCR" = "VRTCR",
-                                                                     "GIPCR" = "GIPCR")
+                                                                     "ATLAS" = "ATLAS",
+                                                                     "PNI" = "PNI"
+                                                                     )
                                                                 ),
                                            br(),
                                            br()

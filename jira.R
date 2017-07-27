@@ -32,3 +32,4 @@ jiraAuthentication <- function (jiraAddress, user, pass){
     return(aut)
   }
 }
+

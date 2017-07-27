@@ -24,6 +24,8 @@ source("getleadtime.R")
 ###################################################
 jiraAddress = ""
 
+print("iniciando")
+
 vProj <- c("ATLAS", "PNI")
 
 
@@ -85,7 +87,7 @@ vLTSP <- c(0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100)
 
 # server logic required to draw the selected graphic
 shinyServer(function(input, output, session) {
-
+      
     # Session global variables
       listProjClosed <<- vector("list", vTotalProj) #mudei aqui de 3 para vTotalProj
       listProjLT <<- vector("list", vTotalProj) #mudei aqui de 3 para vTotalProj
@@ -574,25 +576,12 @@ shinyServer(function(input, output, session) {
           need(aut, ""),
           need(input$selProj != "SEL", "")
         )
-        
-        gt = getBurndownPI("Epic")
-        plot(gt)
+        print("iria chamar plot do burndown")
+
+        #gt = getBurndownPI("Epic")
+        #plot(gt)
         #grid.draw(gt)
       })
-      
-      # PI Panel Stories
-      output$piPanelStories <- renderPlot({
-        shiny::validate(
-          need(aut, ""),
-          need(input$selProj != "SEL", "")
-        )
-        
-        gt = getBurndownPI("Story")
-        plot(gt)
-        #grid.draw(gt)
-      })
-      
-      
       
 
     # Observe for authentication

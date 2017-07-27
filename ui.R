@@ -132,18 +132,10 @@ shinyUI(fluidPage(
                                 DT::dataTableOutput("tableWeibullValues")
                        ),
                        
-                       tabPanel("PI Epics",
+                       tabPanel("PI Panel Epics",
                                 plotOutput("piPanelEpics", width="100%", height="600px")
-                              
-                       ),
-                       
-                       tabPanel("PI Stories",
-                                plotOutput("piPanelStories", width="100%", height="600px")
                                 
                        )
-                       
-                       
-                       
                        
   ))
 ))

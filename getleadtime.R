@@ -1,83 +1,6 @@
 source("jira.R")
 library(plan)
 
-
-getBurndownPI<-function(issueType){
-  issueType="Story"
-  print("get burndown initiated")
-  
-  jiraAddress = ""
-  h2 <- paste(jiraAddress,"/rest/api/2/search?jql=",sep="")
-  
-  if(issueType=="Epic"){
-    param <- "project = ACT and labels = 18Q1 and issuetype = Epic" 
-  } else {
-  param <- "issueFunction in issuesInEpics('project=ACT and labels=18Q1') and issuetype in (Story, Task, Bug)" }
-    
-  #param <- "project = Billing and issuetype = Epic and fixVersion in (FY18Q1)"
-  
-  j2 <- paste(h2, param, "&maxResults=2000", sep="")
-  
-  aut <- jiraAuthentication(jiraAddress,"amandavarella", "NBN-lab245")
-  
-  
-  r2 <- getJiraContent(j2)
-  con <- content(r2, "text")
-  
-  dat <- fromJSON(con)
-  lIssues <- dat$issues
-  nIssues <- length(lIssues$key)
-  
-  
-  lFields <- dat$issues$fields
-  namesClosed <- c("Tipo.de.Pendência", "Issue", "Situação", "Data.de.Resolução" )
-  nc = length(namesClosed)
-  dfClosed = data.frame(matrix(NA, nrow=nIssues, ncol=nc))
-  names(dfClosed) <- namesClosed
-  dfClosed$Tipo.de.Pendência <- unlist(lFields$issuetype$name)
-  dfClosed$Issue <- unlist(lIssues$key)
-  dfClosed$Situação <- unlist(lFields$status$name)
-  data <- unlist(lFields$resolutiondate)
-  d <- substr(data, 9, 10)
-  m <- substr(data, 6, 7)
-  y <- substr(data, 1, 4)
-  date <- paste(y, "-", m, "-", d, " 00:00:00",sep="")
-  dfClosed$Data.de.Resolução <- date
-
-
-  file.remove("pi.dat")
-  line="Start,2017-07-13 00:00:00"
-  write(line,file="pi.dat",append=TRUE)
-  line="Deadline,2017-10-09 00:00:00"
-  write(line,file="pi.dat",append=TRUE)
-  line="Key,Description,Effort"
-  write(line,file="pi.dat",append=TRUE)
-  line=paste("1, Epic,",nIssues)
-  write(line,file="pi.dat",append=TRUE)
-  line="Key,Done,Time"
-  write(line,file="pi.dat",append=TRUE)
-  
-  dfClosed <- dfClosed[dfClosed$Situação=="Done",]
-  
-  if(nrow(dfClosed)==0)
-  {
-    line="1,0,2017-07-14 00:00:00"
-    write(line,file="pi.dat",append=TRUE)
-  }else{
-    for(i in 1:nrow(dfClosed)) 
-    {
-      row <- paste("1,",i,",",dfClosed$Data.de.Resolução)
-      write(row,file="pi.dat",append=TRUE)
-    }
-  }
-
-  b <- read.burndown("pi.dat")
-  
-  return(b)
-}
-
-getBurndownPI("Story")
-
 # Get project Lead Time data
 getProjectLT <- function(proj, team, jiraAddress, rView, ccSwimLaneId, ccQuickFilterId, ccColumns, vTypeClosed, vIniDate) {
   withProgress(message='Lendo dados do projeto', value=0.1, {
@@ -227,4 +150,82 @@ getProjectLT <- function(proj, team, jiraAddress, rView, ccSwimLaneId, ccQuickFi
     return(LT)
   })
 }
+
+
+getBurndownPI<-function(issueType){
+  issueType="Epic"
+  print("get burndown initiated")
+  
+  jiraAddress = ""
+  h2 <- paste(jiraAddress,"/rest/api/2/search?jql=",sep="")
+  
+  if(issueType=="Epic"){
+    param <- "project = ACT and labels = 18Q1 and issuetype = Epic" 
+  } else {
+    param <- "issueFunction in issuesInEpics('project=ACT and labels=18Q1') and issuetype in (Story, Task, Bug)" }
+  
+  #param <- "project = Billing and issuetype = Epic and fixVersion in (FY18Q1)"
+  
+  j2 <- paste(h2, param, "&maxResults=2000", sep="")
+  
+  aut <- jiraAuthentication(jiraAddress,"amandavarella", "NBN-lab245")
+  
+  
+  r2 <- getJiraContent(j2)
+  con <- content(r2, "text")
+  
+  dat <- fromJSON(con)
+  lIssues <- dat$issues
+  nIssues <- length(lIssues$key)
+  
+  
+  lFields <- dat$issues$fields
+  namesClosed <- c("Tipo.de.Pendência", "Issue", "Situação", "Data.de.Resolução" )
+  nc = length(namesClosed)
+  dfClosed = data.frame(matrix(NA, nrow=nIssues, ncol=nc))
+  names(dfClosed) <- namesClosed
+  dfClosed$Tipo.de.Pendência <- unlist(lFields$issuetype$name)
+  dfClosed$Issue <- unlist(lIssues$key)
+  dfClosed$Situação <- unlist(lFields$status$name)
+  data <- unlist(lFields$resolutiondate)
+  d <- substr(data, 9, 10)
+  m <- substr(data, 6, 7)
+  y <- substr(data, 1, 4)
+  date <- paste(y, "-", m, "-", d, " 00:00:00",sep="")
+  dfClosed$Data.de.Resolução <- date
+  
+  
+  file.remove("pi.dat")
+  line="Start,2017-07-13 00:00:00"
+  write(line,file="pi.dat",append=TRUE)
+  line="Deadline,2017-10-09 00:00:00"
+  write(line,file="pi.dat",append=TRUE)
+  line="Key,Description,Effort"
+  write(line,file="pi.dat",append=TRUE)
+  line=paste("1, Epic,",nIssues)
+  write(line,file="pi.dat",append=TRUE)
+  line="Key,Done,Time"
+  write(line,file="pi.dat",append=TRUE)
+  
+  dfClosed <- dfClosed[dfClosed$Situação=="Done",]
+  
+  if(nrow(dfClosed)==0)
+  {
+    line="1,0,2017-07-14 00:00:00"
+    write(line,file="pi.dat",append=TRUE)
+  }else{
+    for(i in 1:nrow(dfClosed)) 
+    {
+      row <- paste("1,",i,",",dfClosed$Data.de.Resolução)
+      write(row,file="pi.dat",append=TRUE)
+    }
+  }
+  
+  b <- read.burndown("pi.dat")
+  
+  plot(b)
+  
+  return(b)
+}
+
 

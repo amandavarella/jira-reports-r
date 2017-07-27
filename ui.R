@@ -138,6 +138,10 @@ shinyUI(fluidPage(
                        
                        tabPanel("PI Panel Story",
                                 plotOutput("piPanelStory", width="100%", height="600px")
+                       ),
+                       
+                       tabPanel("Monte Carlo",
+                                plotOutput("plotMonteCarlo", width="100%", height="600px")
                        )
                        
                        

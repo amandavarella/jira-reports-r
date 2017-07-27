@@ -153,7 +153,9 @@ getProjectLT <- function(proj, team, jiraAddress, rView, ccSwimLaneId, ccQuickFi
 
 
 getBurndownPI<-function(issueType, jiraAddress){
+  ##test
 
+  ###remove
   
   h2 <- paste(jiraAddress,"/rest/api/2/search?jql=",sep="")
   
@@ -213,15 +215,19 @@ getBurndownPI<-function(issueType, jiraAddress){
   
   dfClosed <- dfClosed[dfClosed$Situação=="Done",]
   
+  numRows = nrow(dfClosed)
+  
   if(nrow(dfClosed)==0)
   {
     line="1,0,2017-07-14 00:00:00"
     write(line,file="pi.dat",append=TRUE)
   }else{
-    for(i in 1:nrow(dfClosed)) 
+    for(i in 1:numRows) 
     {
-      row <- paste("1,",i,",",dfClosed$Data.de.Resolução)
+      donePercentage = (100 * i)/nIssues
+      row <- paste("1,",donePercentage,",",dfClosed[i,"Data.de.Resolução"])
       write(row,file="pi.dat",append=TRUE)
+      print(i)
     }
   }
   

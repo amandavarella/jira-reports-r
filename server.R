@@ -18,6 +18,7 @@ library(DT)
 library(plyr)
 
 source("getleadtime.R")
+source("monteCarlo.R")
 
 # Initialize
 # Para acrescentar projetos, é necessário atualizar as variáveis abaixo
@@ -372,6 +373,7 @@ shinyServer(function(input, output, session) {
             }
 
             lt <- ltProj$Lead.Time
+            
             avg <<- mean(lt)
             md <<- median(lt)
             vQ <<- quantile(lt, probs=c(0.3, 0.5, 0.7, 0.85, 0.95))
@@ -385,6 +387,7 @@ shinyServer(function(input, output, session) {
                   theme(axis.title.y=element_text(vjust=1.5, face="bold")) +
                   labs(x="Lead Time - Story", y="Itens Feitos") +
                   geom_histogram(aes(x=Lead.Time), color="black", fill="gray", binwidth=1)
+            
 
             xh <- floor(max(lt) + 0.5)
             xh <- floor(xh/20 + 0.5)
@@ -591,6 +594,24 @@ shinyServer(function(input, output, session) {
        
         gt = getBurndownPI("Story", jiraAddress)
         plot(gt)
+        
+      })
+      
+      
+      # Monte Carlo Panel
+      output$plotMonteCarlo <- renderPlot({
+        shiny::validate(
+          need(aut, ""),
+          need(input$selProj != "SEL", "")
+        )
+        
+        p <- monteCarlo()
+        
+        #gt <- ggplot_gtable(ggplot_build(g))
+        #gt$layout$clip[gt$layout$name=="panel"] <- "off"
+        grid.draw(p)
+        
+        #####
         
       })
       

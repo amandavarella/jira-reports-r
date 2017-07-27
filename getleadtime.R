@@ -153,10 +153,8 @@ getProjectLT <- function(proj, team, jiraAddress, rView, ccSwimLaneId, ccQuickFi
 
 
 getBurndownPI<-function(issueType){
-  issueType="Epic"
-  print("get burndown initiated")
   
-  jiraAddress = ""
+  jiraAddress = "https://jira.nbnco.net.au"
   h2 <- paste(jiraAddress,"/rest/api/2/search?jql=",sep="")
   
   if(issueType=="Epic"){

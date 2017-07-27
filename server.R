@@ -22,7 +22,7 @@ source("getleadtime.R")
 # Initialize
 # Para acrescentar projetos, é necessário atualizar as variáveis abaixo
 ###################################################
-jiraAddress = ""
+jiraAddress = "https://jira.nbnco.net.au"
 
 print("iniciando")
 
@@ -578,9 +578,9 @@ shinyServer(function(input, output, session) {
         )
         print("iria chamar plot do burndown")
 
-        #gt = getBurndownPI("Epic")
-        #plot(gt)
-        #grid.draw(gt)
+        gt = getBurndownPI("Epic")
+        plot(gt)
+
       })
       
 

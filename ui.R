@@ -21,8 +21,8 @@ shinyUI(fluidPage(
                                          wellPanel(
                                            br(),
                                            br(),
-                                           textInput("chave", "Chave", ""),
-                                           passwordInput("senha", "Senha", ""),
+                                           textInput("chave", "Chave", "amandavarella"),
+                                           passwordInput("senha", "Senha", "NBN-lab245"),
                                            actionButton("okAut", "Ok"),
                                            br(),
                                            br()

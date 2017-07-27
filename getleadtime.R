@@ -152,15 +152,19 @@ getProjectLT <- function(proj, team, jiraAddress, rView, ccSwimLaneId, ccQuickFi
 }
 
 
-getBurndownPI<-function(issueType){
+getBurndownPI<-function(issueType, jiraAddress){
+
   
-  jiraAddress = "https://jira.nbnco.net.au"
   h2 <- paste(jiraAddress,"/rest/api/2/search?jql=",sep="")
   
   if(issueType=="Epic"){
-    param <- "project = ACT and labels = 18Q1 and issuetype = Epic" 
+    param <- "project = ACT and labels = 18Q1 and issuetype = Epic"
+    print("Epic")
   } else {
-    param <- "issueFunction in issuesInEpics('project=ACT and labels=18Q1') and issuetype in (Story, Task, Bug)" }
+    param <- "issueFunction in issuesInEpics('project=ACT and labels=18Q1') and issuetype in (Story, Task, Bug)" 
+    print("Story")
+  }
+  print(param)
   
   #param <- "project = Billing and issuetype = Epic and fixVersion in (FY18Q1)"
   
@@ -192,15 +196,17 @@ getBurndownPI<-function(issueType){
   date <- paste(y, "-", m, "-", d, " 00:00:00",sep="")
   dfClosed$Data.de.Resolução <- date
   
+  fn <- "pi.dat"
+  if(file.exists(fn)){file.remove(fn)}
+  file.create(fn)
   
-  file.remove("pi.dat")
   line="Start,2017-07-13 00:00:00"
   write(line,file="pi.dat",append=TRUE)
   line="Deadline,2017-10-09 00:00:00"
   write(line,file="pi.dat",append=TRUE)
   line="Key,Description,Effort"
   write(line,file="pi.dat",append=TRUE)
-  line=paste("1, Epic,",nIssues)
+  line=paste("1,",issueType,",",nIssues)
   write(line,file="pi.dat",append=TRUE)
   line="Key,Done,Time"
   write(line,file="pi.dat",append=TRUE)
@@ -221,7 +227,6 @@ getBurndownPI<-function(issueType){
   
   b <- read.burndown("pi.dat")
   
-  plot(b)
   
   return(b)
 }

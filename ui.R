@@ -21,8 +21,8 @@ shinyUI(fluidPage(
                                          wellPanel(
                                            br(),
                                            br(),
-                                           textInput("chave", "Chave", "amandavarella"),
-                                           passwordInput("senha", "Senha", "NBN-lab245"),
+                                           textInput("chave", "Chave", ""),
+                                           passwordInput("senha", "Senha", ""),
                                            actionButton("okAut", "Ok"),
                                            br(),
                                            br()
@@ -134,8 +134,12 @@ shinyUI(fluidPage(
                        
                        tabPanel("PI Panel Epics",
                                 plotOutput("piPanelEpics", width="100%", height="600px")
-                                
+                       ),
+                       
+                       tabPanel("PI Panel Story",
+                                plotOutput("piPanelStory", width="100%", height="600px")
                        )
+                       
                        
   ))
 ))

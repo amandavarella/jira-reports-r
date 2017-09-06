@@ -126,6 +126,11 @@ shinyServer(function(input, output, session) {
                   return()
             }
             closed$Data <- as.yearmon(closed$Data, "%Y-%m-%d")
+            
+            #writes the closed data into a csv file
+            write.csv(closed, file = paste("./data/",proj,"-closed",".csv",sep=""))
+            
+            
 
           # Set complete range of Dates
             primeDate <- as.Date(vIniDate[indProj])
@@ -137,6 +142,7 @@ shinyServer(function(input, output, session) {
             dfTP <- data.frame(Data=double(numMon), Quant=integer(numMon), row.names=NULL)
             dfTP$Data <- as.yearmon(vDate, "%Y-%m-%d")
             dfTP$Quant <- rep(0, numMon)
+
 
           # Generate throughput data for stories and melhorias
             stories <- closed[closed$Tipo.de.Pendência %in% c("Story", "Melhoria"), ]
@@ -251,9 +257,12 @@ shinyServer(function(input, output, session) {
             if (is.null(meanLT)) {
                   return()
             }
+            
 
             proj <- input$selProj
-            #proj <- "ACT"
+            
+            #writes the meanLT data into a csv file
+            write.csv(meanLT, file = paste("./data/",proj,"-meanLT",".csv",sep=""))
 
             mLT <- aggregate(meanLT$Lead.Time, list(meanLT$Data), mean)
             colnames(mLT) <- c("Data", "LT.Médio")
@@ -313,6 +322,9 @@ shinyServer(function(input, output, session) {
             if (is.null(ltProj)) {
                   return()
             }
+            
+            #writes the ltProj data into a csv file
+            write.csv(ltProj, file = paste("./data/",proj,"-ltProj",".csv",sep=""))
 
             lt <- ltProj$Lead.Time
             avg <<- mean(lt)
@@ -371,6 +383,8 @@ shinyServer(function(input, output, session) {
             if (is.null(ltProj)) {
                   return()
             }
+            
+            
 
             lt <- ltProj$Lead.Time
             

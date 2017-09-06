@@ -47,7 +47,7 @@ monteCarlo <- function(x){
   
   g<- NULL
   g <- ggplot(df.tp.final) 
-  p <- g + geom_histogram(aes(x=df.tp.final$Tp), color="black", fill="gray", binwidth=1)
+  p <- g + geom_histogram(aes(x=df.tp.final$Tp), color="black", fill="gray", binwidth=1) + labs(x="Amount of items in 30 days", y="Freq")
   print(p)
     #+ labs(title=proj) +
     #theme(plot.title=element_text(vjust=2, face="bold")) +

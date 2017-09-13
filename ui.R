@@ -44,7 +44,10 @@ shinyUI(fluidPage(
                                                        choices = c(
                                                                      "Selecione" = "SEL",
                                                                      "ATLAS" = "ATLAS",
-                                                                     "PNI" = "PNI"
+                                                                     "SKYWALKER" = "SKYWALKER",
+                                                                     "ROGUEONE" = "ROGUEONE",
+                                                                     "ATOMS" = "ATOMS",
+                                                                     "iB2B" = "iB2B"
                                                                      )
                                                                 ),
                                            br(),

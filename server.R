@@ -27,50 +27,65 @@ jiraAddress = ""
 
 print("iniciando")
 
-vProj <- c("ATLAS", "PNI")
+vProj <- c("ATLAS","SKYWALKER", "ROGUEONE", "ATOMS", "iB2B")
 
 
 vTotalProj <- length(vProj)
 
 
-vIniDate <- c("2017-03-01", "2017-03-01")
+vIniDate <- c("2017-03-01", "2017-07-01", "2017-04-01", "2017-04-01", "2017-04-01")
 
 
 vTypeClosed <- c(
+               "'Story','Task','Bug'",
+               "'Story','Task','Bug'",
+               "'Story','Task','Bug'",
                "'Story','Task','Bug'",
                "'Story','Task','Bug'"
                )
 
 
-rView <- c(116, 373)
+rView <- c(116, 586, 1691, 119, 719)
 
 
 
 ccColumns <- list(
                      c(3794,603,3788,3784),
-                     c(1951,8710,8714)
+                     c(3478,3479,3480,5551),
+                     c(12008,12009,12010,12011,12012,12007),
+                     c(1781,1782,1785,612,1768),
+                     c(5004,6115,5003)
                    )
 
 
 
 ccSwimLaneId <- list(
                        c(169),
-                       c(527)
+                       c(895,2545,2547),
+                       c(3347),
+                       c(172),
+                       c(1161)
                      )
 
 
-ccQuickFilterId <- c(1875, 3126)
+ccQuickFilterId <- c(1875, 4954, 4957, 5079, 5080)
 
 
 cfColumns <- list(
                     c(602,3794,603,3788,3784,604),
-                    c(1950, 1951, 1952, 8710, 8714)
+                    c(3478,3479,5551,3480,3481),
+                    c(12006,12007,12008,12009,12010,12011,12012,12013),
+                    c(611,1768,612,1781,1782,1785,1789),
+                    c(5002,5003,6115,5004,6118)
                   )
 
 
 cfSwimLane <- list(
                      c(169),
-                     c(527)
+                     c(895,2545,2547),
+                     c(3347),
+                     c(172),
+                     c(1161)
                    )
 
 testVectorSizes <- c(length(vProj), length(vIniDate), length(vTypeClosed), length(rView), length(ccColumns), length(ccSwimLaneId), length(ccQuickFilterId), length(cfColumns), length(cfSwimLane))
@@ -663,8 +678,16 @@ shinyServer(function(input, output, session) {
                   
                   if(input$selProj=="ATLAS"){
                     team = 90
-                  }else if(input$selProj=="PNI"){
-                    team = 87
+                  }else if(input$selProj=="SKYWALKER"){
+                    team = 85
+                  }else if(input$selProj=="ROGUEONE"){
+                    team = 91
+                  }
+                  else if(input$selProj=="ATOMS"){
+                    team = 93
+                  }
+                  else if(input$selProj=="iB2B"){
+                    team = 89
                   }
 
                   if (is.null(listProjLT[[indProj]])) {

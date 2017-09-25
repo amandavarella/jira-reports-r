@@ -95,6 +95,8 @@ if(length(unique(testVectorSizes)) > 1){
   print(testVectorSizes)
   stopApp(returnValue=NULL)
 }
+
+
 ############################################################################################
 ##No arquivo ui.R, alterar tabPanel("Projeto", para incluir o projeto desejado na interface
 ###########################################################################################
@@ -103,7 +105,9 @@ vLTSP <- c(0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100)
 
 # server logic required to draw the selected graphic
 shinyServer(function(input, output, session) {
-      
+      print("vTotalProj")    
+      print(vTotalProj)    
+  
     # Session global variables
       listProjClosed <<- vector("list", vTotalProj) #mudei aqui de 3 para vTotalProj
       listProjLT <<- vector("list", vTotalProj) #mudei aqui de 3 para vTotalProj
@@ -118,7 +122,8 @@ shinyServer(function(input, output, session) {
       sh <<- 0
       sc <<- 0
       aut <<- FALSE
-
+      
+      print("antes de ler o TP")
     # Throughput
       output$plotThroughput <- renderPlot({
             shiny::validate(
@@ -127,25 +132,31 @@ shinyServer(function(input, output, session) {
             )
 
             proj <- input$selProj
-            #if (proj =="ATLAS" | proj = "PNI")
-            #    proj <- "ACT"
             
-
-            closedProj <- listProjClosed[[indProj]]
-            if (is.null(closedProj)) {
+           
+            if(jiraAddress !=""){
+                closedProj <- listProjClosed[[indProj]]
+                if (is.null(closedProj)) {
                   return()
+                }
+              
+                closed <- prepareThroughputData(closedProj)
+                if (is.null(closed)) {
+                      return()
+                }
+                closed$Data <- as.yearmon(closed$Data, "%Y-%m-%d")
+                
+                #writes the closed data into a csv file
+                write.csv(closed, file = paste("./data/",proj,"-closed",".csv",sep=""))
             }
-
-            closed <- prepareThroughputData(closedProj)
-            if (is.null(closed)) {
-                  return()
+            else{
+              print("vou ler o dataset")
+              closed <- read.csv(paste("./data/",proj,"-closed",".csv",sep=""), header = TRUE, sep = ",", quote = "\"",dec = ".", fill = TRUE, comment.char = "")
             }
-            closed$Data <- as.yearmon(closed$Data, "%Y-%m-%d")
+                
+          
             
-            #writes the closed data into a csv file
-            write.csv(closed, file = paste("./data/",proj,"-closed",".csv",sep=""))
-            
-            
+            str(closed)
 
           # Set complete range of Dates
             primeDate <- as.Date(vIniDate[indProj])
@@ -158,14 +169,22 @@ shinyServer(function(input, output, session) {
             dfTP$Data <- as.yearmon(vDate, "%Y-%m-%d")
             dfTP$Quant <- rep(0, numMon)
 
+            View(dfTP)
 
           # Generate throughput data for stories and melhorias
             stories <- closed[closed$Tipo.de.Pendência %in% c("Story", "Melhoria"), ]
             storyThroughput <- aggregate(stories$Tipo.de.Pendência, list(stories$Data), length)
             colnames(storyThroughput) <- c("Data", "Quantidade")
+            
+            
+            if(jiraAddress ==""){
+              storyThroughput$Data <- paste("01", storyThroughput$Data, sep = " ")
+              storyThroughput$Data <- as.yearmon(storyThroughput$Data, "%d %b %Y")
+            }
+            
 
-          # Complete throughput data with missing months
-            storyThroughput <- merge(storyThroughput, dfTP, by="Data", all.y=TRUE)
+          # Complete throughput data with missing months (with Jira, uncomment the following line)
+            storyThroughput <- merge(storyThroughput, dfTP, by="Data", all=TRUE)
             storyThroughput$Quantidade[is.na(storyThroughput$Quantidade)] <- 0
             if (ncol(storyThroughput) > 2)  {
                   storyThroughput <- storyThroughput[, 1:2]
@@ -185,10 +204,10 @@ shinyServer(function(input, output, session) {
             typeThroughput <- data.frame(Data=double(0),
                   Tipo.de.Pendência=character(0), Quantidade=integer(0), row.names=NULL)
             vtl <- levels(as.factor(tt$Tipo.de.Pendência))
-            vt <- vtl[!vtl %in% c("Story", "Melhoria", "Defeito")]
+            vt <- vtl[!vtl %in% c("Story", "Melhoria", "Bug")]
             nvt <- length(vt)
 
-            vtt <- "Defeito"
+            vtt <- "Bug"
             for (i in 1:nvt) {
                   vtt <- c(vtt, vt[i])
             }
@@ -652,7 +671,12 @@ shinyServer(function(input, output, session) {
             user <- input$chave
             pass <- input$senha
             
+            if (jiraAddress!=""){
             aut <- jiraAuthentication(jiraAddress, user, pass)
+            }
+            else{
+              aut <<- TRUE
+            }
             
             if (!aut) {
                   updateTextInput(session, "chave", value="")
@@ -690,10 +714,12 @@ shinyServer(function(input, output, session) {
                     team = 89
                   }
 
-                  if (is.null(listProjLT[[indProj]])) {
-                        ltProj <- getProjectLT(proj, team, jiraAddress, rView, ccSwimLaneId, ccQuickFilterId, ccColumns, vTypeClosed, vIniDate)
-                        if (is.null(ltProj)) {
-                              return()
+                  if (jiraAddress != ""){
+                        if (is.null(listProjLT[[indProj]])) {
+                              ltProj <- getProjectLT(proj, team, jiraAddress, rView, ccSwimLaneId, ccQuickFilterId, ccColumns, vTypeClosed, vIniDate)
+                              if (is.null(ltProj)) {
+                                    return()
+                              }
                         }
                   }
 

@@ -155,8 +155,7 @@ shinyServer(function(input, output, session) {
             }
                 
           
-            
-            str(closed)
+     
 
           # Set complete range of Dates
             primeDate <- as.Date(vIniDate[indProj])
@@ -169,7 +168,6 @@ shinyServer(function(input, output, session) {
             dfTP$Data <- as.yearmon(vDate, "%Y-%m-%d")
             dfTP$Quant <- rep(0, numMon)
 
-            View(dfTP)
 
           # Generate throughput data for stories and melhorias
             stories <- closed[closed$Tipo.de.Pendência %in% c("Story", "Melhoria"), ]
@@ -183,7 +181,7 @@ shinyServer(function(input, output, session) {
             }
             
 
-          # Complete throughput data with missing months (with Jira, uncomment the following line)
+          # Complete throughput data with missing months
             storyThroughput <- merge(storyThroughput, dfTP, by="Data", all=TRUE)
             storyThroughput$Quantidade[is.na(storyThroughput$Quantidade)] <- 0
             if (ncol(storyThroughput) > 2)  {
@@ -197,8 +195,14 @@ shinyServer(function(input, output, session) {
             if (ncol(tt) > 3)  {
                   tt <- tt[, 1:3]
             }
+            
             colnames(tt) <- c("Data", "Tipo.de.Pendência", "Quantidade")
-#            tt$Data <- as.yearmon(tt$Data, "%Y-%m-%d")
+            
+            if(jiraAddress ==""){
+              tt$Data <- paste("01", tt$Data, sep = " ")
+              tt$Data <- as.yearmon(tt$Data, "%d %b %Y")
+            }
+              
 
           # Complete all types throughput data with missing months
             typeThroughput <- data.frame(Data=double(0),
@@ -218,7 +222,7 @@ shinyServer(function(input, output, session) {
             nvt <- length(vt)
             for (i in 1:nvt) {
                   mtt <- tt[tt$Tipo.de.Pendência==vt[i], ]
-                  mtt <- merge(mtt, dfTP, by="Data", all.y=TRUE)
+                  mtt <- merge(mtt, dfTP, by="Data", all=TRUE)
                   mtt$Tipo.de.Pendência[is.na(mtt$Tipo.de.Pendência)] <- vt[i]
                   typeThroughput <- rbind(typeThroughput, mtt)
             }

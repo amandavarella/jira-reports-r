@@ -150,7 +150,6 @@ shinyServer(function(input, output, session) {
                 write.csv(closed, file = paste("./data/",proj,"-closed",".csv",sep=""))
             }
             else{
-              print("vou ler o dataset")
               closed <- read.csv(paste("./data/",proj,"-closed",".csv",sep=""), header = TRUE, sep = ",", quote = "\"",dec = ".", fill = TRUE, comment.char = "")
             }
                 
@@ -348,13 +347,15 @@ shinyServer(function(input, output, session) {
 
     # Scatter Plot chart
       output$plotSP <- renderPlot({
-            shiny::validate(
-                  need(aut, "Entre com chave e senha!"),
-                  need(input$selProj != "SEL", "Selecione Projeto!")
-            )
-
-            proj <- input$selProj
-            #proj <- "ACT"
+        
+       
+        shiny::validate(
+              need(aut, "Entre com chave e senha!"),
+              need(input$selProj != "SEL", "Selecione Projeto!")
+        )
+        proj <- input$selProj
+        
+        if(jiraAddress !=""){
 
             ltProj <- listProjLT[[indProj]]
             if (is.null(ltProj)) {
@@ -363,6 +364,11 @@ shinyServer(function(input, output, session) {
             
             #writes the ltProj data into a csv file
             write.csv(ltProj, file = paste("./data/",proj,"-ltProj",".csv",sep=""))
+            
+        }else{
+          ltProj <- read.csv(paste("./data/",proj,"-ltProj",".csv",sep=""), header = TRUE, sep = ",", quote = "\"",dec = ".", fill = TRUE, comment.char = "")
+          ltProj$Data.de.Resolução <- as.Date(ltProj$Data.de.Resolução)
+        }
 
             lt <- ltProj$Lead.Time
             avg <<- mean(lt)
@@ -413,15 +419,17 @@ shinyServer(function(input, output, session) {
                   need(aut, ""),
                   need(input$selProj != "SEL", "")
             )
-
-            #proj <- input$selProj
-            proj <- "ACT"
-
-            ltProj <- listProjLT[[indProj]]
-            if (is.null(ltProj)) {
-                  return()
-            }
+            proj <- input$selProj
             
+            if(jiraAddress !=""){
+                  ltProj <- listProjLT[[indProj]]
+                  if (is.null(ltProj)) {
+                        return()
+                  }
+            }else{
+              ltProj <- read.csv(paste("./data/",proj,"-ltProj",".csv",sep=""), header = TRUE, sep = ",", quote = "\"",dec = ".", fill = TRUE, comment.char = "")
+              ltProj$Data.de.Resolução <- as.Date(ltProj$Data.de.Resolução)
+            }
             
 
             lt <- ltProj$Lead.Time

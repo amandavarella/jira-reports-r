@@ -564,9 +564,14 @@ shinyServer(function(input, output, session) {
                   need(input$selProj != "SEL", "")
             )
 
-            if (is.null(listProjLT[[indProj]])) {
-                  return()
+            
+            if(jiraAddress !=""){
+              ltProj <- listProjLT[[indProj]]
+              if (is.null(ltProj)) {
+                return()
+              }
             }
+            
 
             tLTNames <- c("Average", "Median", vLQ)
             avg <<- as.numeric(format(avg, digits=2, nsmall=2))
@@ -584,8 +589,11 @@ shinyServer(function(input, output, session) {
           need(input$selProj != "SEL", "")
         )
         
-        if (is.null(listProjLT[[indProj]])) {
-          return()
+        if(jiraAddress !=""){
+          ltProj <- listProjLT[[indProj]]
+          if (is.null(ltProj)) {
+            return()
+          }
         }
         
         tLTNames <- c("Average", "Median", vLQ)
@@ -604,8 +612,11 @@ shinyServer(function(input, output, session) {
                   need(input$selProj != "SEL", "")
             )
 
-            if (is.null(listProjLT[[indProj]])) {
-                  return()
+            if(jiraAddress !=""){
+              ltProj <- listProjLT[[indProj]]
+              if (is.null(ltProj)) {
+                return()
+              }
             }
 
             tLTNames <- c("Shape", "Scale")
@@ -623,8 +634,11 @@ shinyServer(function(input, output, session) {
                   need(input$selProj != "SEL", "")
             )
 
-            if (is.null(listProjLT[[indProj]])) {
-                  return()
+            if(jiraAddress !=""){
+              ltProj <- listProjLT[[indProj]]
+              if (is.null(ltProj)) {
+                return()
+              }
             }
 
             tLTNames <- c("Average", "Median", vLQ)

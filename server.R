@@ -652,48 +652,6 @@ shinyServer(function(input, output, session) {
       }, options=list(paging=FALSE, info=FALSE, searching=FALSE, ordering=FALSE))
       
       
-      # PI Panel Epics
-      output$piPanelEpics <- renderPlot({
-        shiny::validate(
-          need(aut, ""),
-          need(input$selProj != "SEL", "")
-        )
-
-        gt = getBurndownPI("Epic", jiraAddress)
-        plot(gt)
-
-      })
-      
-      # PI Panel Stories
-      output$piPanelStories <- renderPlot({
-        shiny::validate(
-          need(aut, ""),
-          need(input$selProj != "SEL", "")
-        )
-       
-        gt = getBurndownPI("Story", jiraAddress)
-        plot(gt)
-        
-      })
-      
-      
-      # Monte Carlo Panel
-      output$plotMonteCarlo <- renderPlot({
-        shiny::validate(
-          need(aut, ""),
-          need(input$selProj != "SEL", "")
-        )
-        
-        p <- monteCarlo()
-        
-        #gt <- ggplot_gtable(ggplot_build(g))
-        #gt$layout$clip[gt$layout$name=="panel"] <- "off"
-        grid.draw(p)
-        
-        #####
-        
-      })
-      
 
     # Observe for authentication
       observeEvent(input$okAut, {
@@ -714,7 +672,7 @@ shinyServer(function(input, output, session) {
                   updateTextInput(session, "senha", value="")
             }
             else {
-                  updateTabsetPanel(session, "tabset", selected = "Projeto")
+                  updateTabsetPanel(session, "tabset", selected = "Project")
             }
       })
 
@@ -767,7 +725,7 @@ shinyServer(function(input, output, session) {
             if (!aut) {
                   updateTabsetPanel(session, "tabset", selected = "Login")
             } else if (input$selProj == "SEL") {
-                  updateTabsetPanel(session, "tabset", selected = "Projeto")
+                  updateTabsetPanel(session, "tabset", selected = "Project")
             }
       })
 

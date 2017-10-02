@@ -31,7 +31,7 @@ shinyUI(fluidPage(
                                 )
                        ),
 
-                       tabPanel("Projeto",
+                       tabPanel("Project",
                                 fluidRow(
                                   column(4),
                                   column(4, offset=3.5,
@@ -40,7 +40,7 @@ shinyUI(fluidPage(
                                          br(),
                                          wellPanel(
                                            br(),
-                                           selectInput("selProj", label = h5("Projeto:"),
+                                           selectInput("selProj", label = h5("Project:"),
                                                        choices = c(
                                                                      "Selecione" = "SEL",
                                                                      "ATLAS" = "ATLAS",
@@ -57,7 +57,7 @@ shinyUI(fluidPage(
                                 )
                        ),
 
-                       tabPanel("Rendimento",
+                       tabPanel("Delivery Rate",
                                 fluidPage(
                                   br(),
                                   fluidRow(
@@ -121,7 +121,7 @@ shinyUI(fluidPage(
                                 DT::dataTableOutput("tableSP")
                        ),
 
-                       tabPanel("Histograma",
+                       tabPanel("Histogram",
                                 plotOutput("plotHist", width="100%", height="600px"),
                                 br(),
                                 DT::dataTableOutput("tableHist")
@@ -133,19 +133,8 @@ shinyUI(fluidPage(
                                 DT::dataTableOutput("tableWeibullParam"),
                                 br(),
                                 DT::dataTableOutput("tableWeibullValues")
-                       ),
-                       
-                       tabPanel("PI Panel Epics",
-                                plotOutput("piPanelEpics", width="100%", height="600px")
-                       ),
-                       
-                       tabPanel("PI Panel Story",
-                                plotOutput("piPanelStory", width="100%", height="600px")
-                       ),
-                       
-                       tabPanel("Monte Carlo",
-                                plotOutput("plotMonteCarlo", width="100%", height="600px")
                        )
+                       
                        
                        
   ))

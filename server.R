@@ -481,13 +481,18 @@ shinyServer(function(input, output, session) {
                   need(input$selProj != "SEL", "")
             )
 
-            #proj <- input$selProj
-            proj <- "ACT"
-
-            ltProj <- listProjLT[[indProj]]
-            if (is.null(ltProj)) {
-                  return()
+            proj <- input$selProj
+            
+            if(jiraAddress !=""){
+              ltProj <- listProjLT[[indProj]]
+              if (is.null(ltProj)) {
+                return()
+              }
+            }else{
+              ltProj <- read.csv(paste("./data/",proj,"-ltProj",".csv",sep=""), header = TRUE, sep = ",", quote = "\"",dec = ".", fill = TRUE, comment.char = "")
+              ltProj$Data.de.Resolução <- as.Date(ltProj$Data.de.Resolução)
             }
+            
 
             lt <- ltProj$Lead.Time
             avg <<- mean(lt)
